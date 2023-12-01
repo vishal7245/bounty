@@ -1,5 +1,6 @@
 # Player Markers Documentation
-##Screenshot
+
+## Screenshot
 ![Screenshot](https://github.com/vishal7245/bounty/blob/main/Screenshot%20from%202023-12-01%2016-01-30.png)
 
 ## Introduction
