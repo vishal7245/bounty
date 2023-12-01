@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.11.7/video-js.min.css" rel="stylesheet" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.11.7/video.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-eme@3.8.0/dist/videojs-contrib-eme.js"></script>
+
+    <script src='/node_modules/videojs-markers-plugin/dist/videojs-markers-plugin.js'></script>
+    <link href="/node_modules/videojs-markers-plugin/dist/videojs.markers.plugin.css" rel="stylesheet">
+    <title>Test VideJS DRM</title>
+
+    <style>
+        ul#marker-list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            /* Use flexbox to create a horizontal layout */
+            width: 100%;
+            overflow-x: auto;
+            /* Add a horizontal scrollbar if needed */
+        }
+
+        ul#marker-list li {
+            flex: 0 0 auto;
+            /* Prevent items from growing */
+            margin-right: 10px;
+            /* Adjust spacing between items */
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        ul#marker-list li:last-child {
+            margin-right: 0;
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        ul#marker-list li a {
+            display: block;
+            padding: 10px 15px;
+            color: #555;
+            text-decoration: none;
+        }
+
+        ul#marker-list li a:hover {
+            color: #555;
+            text-decoration: none;
+            background-color: #f5f5f5;
+        }
+
+        ul#marker-list li.active {
+            background-color: #66b2ff;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="margin: 50px auto;">
+        <video id="my-video" class="video-js"></video>
+    </div>
+
+    <ul id='marker-list'>
+
+    </ul>
+
+
+    <script>
+
+        //Segementation timestamps
+        section_markers = [
+            { time: 9.5, text: "Section 1" },
+            { time: 16, text: "Section 2" },
+            { time: 23.6, text: "Section 3" },
+            { time: 28, text: "Section 4" },
+            { time: 35.2, text: "Section 5" },
+            { time: 42.8, text: "Section 6" },
+            { time: 49.3, text: "Section 7" },
+            { time: 55, text: "Section 8" },
+            { time: 62.1, text: "Section 9" }
+        ]
+
+        var player = videojs(
+            'my-video',
+            {
+                controls: true,
+                fluid: true,
+                html5: {
+                    vhs: {
+                        overrideNative: true
+                    }
+                }
+            },
+            function () {
+                var player = this;
+                player.eme();
+                player.src({
+                    src: 'https://cdn.bitmovin.com/content/assets/art-of-motion_drm/mpds/11331.mpd',
+                    type: 'application/dash+xml',
+                    keySystems: {
+                        'com.widevine.alpha': 'https://cwip-shaka-proxy.appspot.com/no_auth',
+                    }
+                });
+
+
+                player.ready(function () {
+
+                    player.tech(true).on('keystatuschange', function (event) {
+                        console.log("event: ", event);
+
+                    });
+
+                });
+            }
+
+        );
+
+        player.markers({
+
+            //Customizing marker style
+            markerStyle: {
+                'width': '8px',
+                'height': '4px',
+                'background-color': '#acacb1',
+            },
+
+            //Adding the markers
+            markers: section_markers,
+
+            markerTip: {
+                display: true,
+                text: function (marker) {
+                    return marker.text;
+                },
+            },
+
+            breakOverlay: {
+                display: true,
+                displayTime: 3,
+                text: function (marker) {
+                    return "This is an overlay: " + marker.text;
+                }
+            },
+
+            onMarkerReached: function (marker) {
+                console.log(marker);
+            },
+
+            onMarkerReached: function (marker) {
+                console.log(marker);
+
+                // Remove previous active class
+                $("#marker-list li").removeClass("active");
+
+                // Add active class to the current marker's button
+                $("#marker-list li[data-index='" + marker.index + "']").addClass("active");
+            },
+
+        });
+
+        $(document).ready(function () {
+            // insert marker list
+            for (var i = 0; i < section_markers.length; i++) {
+                var item = $("<li data-index='" + i + "'><a href='#'>" + section_markers[i].text + "</a></li>");
+                $("#marker-list").append(item);
+            }
+
+            // set up click event
+            $("#marker-list li").click(function () {
+                var index = $(this).data("index");
+
+                player.currentTime(section_markers[index].time);
+            });
+        });
+    </script>
+</body>
+
+</html>
