@@ -2,6 +2,7 @@
 
 ## Screenshot
 ![Screenshot](https://github.com/vishal7245/bounty/blob/main/Screenshot%20from%202023-12-01%2016-01-30.png)
+![Screenshot2](https://github.com/vishal7245/bounty/blob/main/Screenshot%20from%202023-12-01%2016-10-43.png)
 
 ## Introduction
 The `player.markers` function is used to enhance a player interface with markers, allowing users to mark specific points in a media player's timeline. This documentation will guide you through using this code snippet to add and customize markers in your web application.
